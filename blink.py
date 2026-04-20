@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 
-import gpiod
 import time
+import gpiod
+from gpiod.line import Direction, Value
 
-CHIP = "gpiochip0"
+CHIP = "/dev/gpiochip0"
 LINE = 16
 
-chip = gpiod.Chip(CHIP)
-line = chip.get_line(LINE)
-
-line.request(consumer="blink", type=gpiod.LINE_REQ_DIR_OUT)
+req = gpiod.request_lines(
+    CHIP,
+    consumer="myproduct-led",
+    config={
+        LINE: gpiod.LineSettings(direction=Direction.OUTPUT)
+    },
+    output_values={LINE: Value.INACTIVE},
+)
 
 try:
     while True:
-        line.set_value(1)
+        req.set_value(LINE, Value.ACTIVE)
         time.sleep(0.5)
-        line.set_value(0)
+        req.set_value(LINE, Value.INACTIVE)
         time.sleep(0.5)
-except KeyboardInterrupt:
-    pass
 finally:
-    line.set_value(0)
-    line.release()
+    req.set_value(LINE, Value.INACTIVE)
+    req.release()
