@@ -19,9 +19,9 @@ req = gpiod.request_lines(
 try:
     while True:
         req.set_value(LINE, Value.ACTIVE)
-        time.sleep(0.5)
+        time.sleep(0.1)
         req.set_value(LINE, Value.INACTIVE)
-        time.sleep(0.5)
+        time.sleep(0.1)
 finally:
     req.set_value(LINE, Value.INACTIVE)
     req.release()
